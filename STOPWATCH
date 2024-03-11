@@ -1,0 +1,161 @@
+<html>
+<head>
+    <title>Stopwatch</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #180719;
+            color: #ffb9b9;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-family: "Montserrat", sans-serif;
+            font-weight: 200;
+            text-align: center;
+            line-height: 59px;
+            padding: 0 64px;
+            margin: 0;
+        }
+
+        .gold {
+            text-align: center;
+            font-weight: 900;
+            color: #74f114;
+            text-shadow: 0 0 0px #ed9e9e, 0 0 50px #f5da8a;
+        }
+
+        .stopwatch {
+            text-align: center;
+            display: grid;
+            justify-items: center;
+            grid-row-gap: 23px;
+            width: 100%;
+            padding-top: 25px;
+        }
+
+        #display {
+            text-align: center;
+            align-items: center;
+            font-size: 2em;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        button {
+            align-items: center;
+            cursor: pointer;
+            width: fit-content;
+            padding: 10px;
+            background-color: #61dafb;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .circle {
+            position: relative;
+            left: 130px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            width: 200px;
+            border: 2px solid;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+  <div id="display">
+    <h1><span class="gold">STOP WATCH</span></h1>
+    <div class="circle" id="stopwatch">00:00:00</div>
+    <button id="startStop" onclick="startStop()">Ready</button>
+    <button id="reset" onclick="reset()">RESET</button>
+    <button onclick="lap()">LAP</button>
+    <div id="lap"></div>
+  </div>
+
+    <script>
+        let isRunning = false;
+        let startTime;
+        let laps = [];
+        
+        function startStop() {
+          if (isRunning) {
+            stop();
+            document.getElementById("startStop").textContent = "START";
+          } else {
+            start();
+            document.getElementById("startStop").textContent = "PAUSE";
+          }
+        }
+    
+        function start() {
+          isRunning = true;
+          startTime = new Date().getTime() - (laps.length > 0 ? laps[laps.length - 1].elapsed : 0);
+          update();
+        }
+    
+        function stop() {
+          isRunning = false;
+          laps.push({ elapsed: new Date().getTime() - startTime });
+          update();
+        }
+    
+        function reset() {
+          isRunning = false;
+          startTime = 0;
+          laps = [];
+          update();
+          updateLaps();
+        }
+    
+        function lap() {
+          if (isRunning) {
+            laps.push({ elapsed: new Date().getTime() - startTime });
+            updateLaps();
+          }
+        }
+    
+        function update() {
+          const elapsed = isRunning ? new Date().getTime() - startTime : 0;
+          const formattedTime = formatTime(elapsed);
+          document.getElementById('stopwatch').innerText = formattedTime;
+          setTimeout(update, 10);
+        }
+    
+        function formatTime(time) {
+          const hours = Math.floor(time / 3600000);
+          const minutes = Math.floor((time % 3600000) / 60000);
+          const seconds = Math.floor((time % 60000) / 1000);
+          const milliseconds = time % 1000;
+          return (
+            pad(hours) + ':' +
+            pad(minutes) + ':' +
+            pad(seconds) + ':' +
+            pad(Math.floor(milliseconds / 10))
+          );
+        }
+    
+        function pad(value) {
+          return value < 10 ? '0' + value : value;
+        }
+    
+        function updateLaps() {
+          const lapsContainer = document.getElementById('lap');
+          lapsContainer.innerHTML = '';
+          laps.forEach((lap, index) => {
+            const lapTime = formatTime(lap.elapsed);
+            lapsContainer.innerHTML += `<div>Lap ${index + 1}: ${lapTime}</div>`;
+          });
+        }
+      </script>
+    </body>
+    </html>
